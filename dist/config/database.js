@@ -39,48 +39,31 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var express_1 = __importDefault(require("express"));
-var dotenv_1 = require("dotenv");
-var fs_1 = __importDefault(require("fs"));
-var path_1 = __importDefault(require("path"));
-var helmet_1 = __importDefault(require("helmet"));
-var morgan_1 = __importDefault(require("morgan"));
-var cors_1 = __importDefault(require("cors"));
-var express_session_1 = __importDefault(require("express-session"));
-var database_1 = __importDefault(require("./config/database"));
-(function () { return __awaiter(void 0, void 0, void 0, function () {
-    var app, accessLogStream, port;
+var mongoose_1 = __importDefault(require("mongoose"));
+var ConnectToDb = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var connection, e_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                dotenv_1.config();
-                return [4 /*yield*/, database_1.default()];
+                _a.trys.push([0, 2, , 3]);
+                return [4 /*yield*/, mongoose_1.default.connect(process.env.MONGO_URI, {
+                        useNewUrlParser: true,
+                        useUnifiedTopology: true,
+                        useCreateIndex: true,
+                        useFindAndModify: false,
+                    })];
             case 1:
-                _a.sent();
-                app = express_1.default();
-                app.use(helmet_1.default());
-                app.use(cors_1.default());
-                app.use(express_1.default.json());
-                app.use(morgan_1.default("dev"));
-                app.use(express_session_1.default({
-                    secret: "secretcode",
-                    resave: true,
-                    saveUninitialized: true,
-                    cookie: {
-                        sameSite: "none",
-                        secure: true,
-                        maxAge: 1000 * 60 * 60 * 24 * 7, // One Week
-                    },
-                }));
-                if (process.env.NODE_ENV === "production") {
-                    accessLogStream = fs_1.default.createWriteStream(path_1.default.join(__dirname, "access.log"), { flags: "a" });
-                    app.use(morgan_1.default("combined", { stream: accessLogStream }));
-                }
-                app.get("/", function (_, res) { return res.json({ msg: "hello World!" }); });
-                port = process.env.PORT || 5000;
-                app.listen(port, function () { return console.log("Server is running on port " + port + " ..."); });
-                return [2 /*return*/];
+                connection = _a.sent();
+                if (connection)
+                    console.log("Connected to DB (; ...");
+                return [3 /*break*/, 3];
+            case 2:
+                e_1 = _a.sent();
+                console.log(e_1);
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
         }
     });
-}); })().catch(function (e) { return console.log(e); });
-//# sourceMappingURL=index.js.map
+}); };
+exports.default = ConnectToDb;
+//# sourceMappingURL=database.js.map
