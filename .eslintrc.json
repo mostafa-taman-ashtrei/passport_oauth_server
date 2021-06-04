@@ -23,6 +23,7 @@
             "error",
             "double"
         ],
+        "no-underscore-dangle": "off",
         "no-console": "off",
         "indent": [
             "error",

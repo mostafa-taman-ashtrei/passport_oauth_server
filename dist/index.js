@@ -47,7 +47,10 @@ var helmet_1 = __importDefault(require("helmet"));
 var morgan_1 = __importDefault(require("morgan"));
 var cors_1 = __importDefault(require("cors"));
 var express_session_1 = __importDefault(require("express-session"));
+var passport_1 = __importDefault(require("passport"));
 var database_1 = __importDefault(require("./config/database"));
+var githubStartegy_1 = __importDefault(require("./auth/githubStartegy"));
+var User_1 = __importDefault(require("./models/User"));
 (function () { return __awaiter(void 0, void 0, void 0, function () {
     var app, accessLogStream, port;
     return __generator(this, function (_a) {
@@ -59,24 +62,39 @@ var database_1 = __importDefault(require("./config/database"));
                 _a.sent();
                 app = express_1.default();
                 app.use(helmet_1.default());
-                app.use(cors_1.default());
+                app.use(cors_1.default({ origin: "http://localhost:3000", credentials: true }));
                 app.use(express_1.default.json());
                 app.use(morgan_1.default("dev"));
                 app.use(express_session_1.default({
+                    name: "myCookie",
                     secret: "secretcode",
-                    resave: true,
-                    saveUninitialized: true,
+                    resave: false,
+                    saveUninitialized: false,
                     cookie: {
-                        sameSite: "none",
-                        secure: true,
-                        maxAge: 1000 * 60 * 60 * 24 * 7, // One Week
+                        maxAge: 1000 * 60 * 60 * 24 * 365 * 5,
+                        httpOnly: true,
+                        sameSite: "lax",
+                        secure: process.env.NODE_ENV === "production", // cookie only works in https
                     },
                 }));
+                app.use(passport_1.default.initialize());
+                app.use(passport_1.default.session());
+                passport_1.default.serializeUser(function (user, done) { return done(null, user._id); });
+                passport_1.default.deserializeUser(function (id, done) { return User_1.default.findById(id, function (_, doc) { return done(null, doc); }); });
+                passport_1.default.use(githubStartegy_1.default());
                 if (process.env.NODE_ENV === "production") {
                     accessLogStream = fs_1.default.createWriteStream(path_1.default.join(__dirname, "access.log"), { flags: "a" });
                     app.use(morgan_1.default("combined", { stream: accessLogStream }));
                 }
                 app.get("/", function (_, res) { return res.json({ msg: "hello World!" }); });
+                app.get("/auth/github", passport_1.default.authenticate("github"));
+                app.get("/auth/github/callback", passport_1.default.authenticate("github", { failureRedirect: "http://localhost:3000/error", session: true }), function (_, res) {
+                    res.redirect("http://localhost:3000/");
+                });
+                app.get("/getuser", function (req, res) {
+                    console.log(req.user);
+                    res.json({ user: req.user });
+                });
                 port = process.env.PORT || 5000;
                 app.listen(port, function () { return console.log("Server is running on port " + port + " ..."); });
                 return [2 /*return*/];
