@@ -1,5 +1,5 @@
 import { Strategy as GithubStrategy } from "passport-github";
-import UserModel from "../models/User";
+import UserModel from "../../models/User";
 
 const Strategy = () => new GithubStrategy({
     clientID: process.env.GITHUB_CLIENT_ID!,
@@ -16,11 +16,11 @@ const Strategy = () => new GithubStrategy({
         });
 
         await newUser.save();
+        console.log("created a new User");
         cb(null, newUser);
-        console.log("created User");
     } else {
         cb(null, user);
-        console.log(user.username);
+        console.log(user);
     }
 });
 

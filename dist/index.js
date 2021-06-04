@@ -49,7 +49,8 @@ var cors_1 = __importDefault(require("cors"));
 var express_session_1 = __importDefault(require("express-session"));
 var passport_1 = __importDefault(require("passport"));
 var database_1 = __importDefault(require("./config/database"));
-var githubStartegy_1 = __importDefault(require("./auth/githubStartegy"));
+var createRoutes_1 = __importDefault(require("./routes/createRoutes"));
+var githubStartegy_1 = __importDefault(require("./controllers/auth/githubStartegy"));
 var User_1 = __importDefault(require("./models/User"));
 (function () { return __awaiter(void 0, void 0, void 0, function () {
     var app, accessLogStream, port;
@@ -74,7 +75,7 @@ var User_1 = __importDefault(require("./models/User"));
                         maxAge: 1000 * 60 * 60 * 24 * 365 * 5,
                         httpOnly: true,
                         sameSite: "lax",
-                        secure: process.env.NODE_ENV === "production", // cookie only works in https
+                        secure: process.env.NODE_ENV === "production", // cookie only works in https if running in production
                     },
                 }));
                 app.use(passport_1.default.initialize());
@@ -86,16 +87,8 @@ var User_1 = __importDefault(require("./models/User"));
                     accessLogStream = fs_1.default.createWriteStream(path_1.default.join(__dirname, "access.log"), { flags: "a" });
                     app.use(morgan_1.default("combined", { stream: accessLogStream }));
                 }
-                app.get("/", function (_, res) { return res.json({ msg: "hello World!" }); });
-                app.get("/auth/github", passport_1.default.authenticate("github"));
-                app.get("/auth/github/callback", passport_1.default.authenticate("github", { failureRedirect: "http://localhost:3000/error", session: true }), function (_, res) {
-                    res.redirect("http://localhost:3000/");
-                });
-                app.get("/getuser", function (req, res) {
-                    console.log(req.user);
-                    res.json({ user: req.user });
-                });
-                port = process.env.PORT || 5000;
+                createRoutes_1.default(app);
+                port = process.env.PORT || 8080;
                 app.listen(port, function () { return console.log("Server is running on port " + port + " ..."); });
                 return [2 /*return*/];
         }

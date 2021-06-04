@@ -9,7 +9,8 @@ import session from "express-session";
 import passport from "passport";
 
 import ConnectToDb from "./config/database";
-import GithubStrategy from "./auth/githubStartegy";
+import createRoutes from "./routes/createRoutes";
+import GithubStrategy from "./controllers/auth/githubStartegy";
 import { MyUser } from "./types";
 import UserModel from "./models/User";
 
@@ -34,7 +35,7 @@ import UserModel from "./models/User";
                 maxAge: 1000 * 60 * 60 * 24 * 365 * 5, // expires after 5 years
                 httpOnly: true,
                 sameSite: "lax", // protect against csrf
-                secure: process.env.NODE_ENV === "production", // cookie only works in https
+                secure: process.env.NODE_ENV === "production", // cookie only works in https if running in production
             },
         }),
     );
@@ -52,23 +53,8 @@ import UserModel from "./models/User";
         app.use(morgan("combined", { stream: accessLogStream }));
     }
 
-    app.get("/", (_, res) => res.json({ msg: "hello World!" }));
+    createRoutes(app);
+    const port = process.env.PORT || 8080;
 
-    app.get("/auth/github", passport.authenticate("github"));
-
-    app.get(
-        "/auth/github/callback",
-        passport.authenticate("github", { failureRedirect: "http://localhost:3000/error", session: true }),
-        (_, res) => {
-            res.redirect("http://localhost:3000/");
-        },
-    );
-
-    app.get("/getuser", (req, res) => {
-        console.log(req.user);
-        res.json({ user: req.user });
-    });
-
-    const port = process.env.PORT || 5000;
     app.listen(port, () => console.log(`Server is running on port ${port} ...`));
 })().catch((e) => console.log(e));
