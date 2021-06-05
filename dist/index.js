@@ -50,8 +50,9 @@ var express_session_1 = __importDefault(require("express-session"));
 var passport_1 = __importDefault(require("passport"));
 var database_1 = __importDefault(require("./config/database"));
 var createRoutes_1 = __importDefault(require("./routes/createRoutes"));
-var githubStartegy_1 = __importDefault(require("./controllers/auth/githubStartegy"));
 var User_1 = __importDefault(require("./models/User"));
+var githubStartegy_1 = __importDefault(require("./services/auth/githubStartegy"));
+var facebookStartegy_1 = __importDefault(require("./services/auth/facebookStartegy"));
 (function () { return __awaiter(void 0, void 0, void 0, function () {
     var app, accessLogStream, port;
     return __generator(this, function (_a) {
@@ -81,8 +82,13 @@ var User_1 = __importDefault(require("./models/User"));
                 app.use(passport_1.default.initialize());
                 app.use(passport_1.default.session());
                 passport_1.default.serializeUser(function (user, done) { return done(null, user._id); });
-                passport_1.default.deserializeUser(function (id, done) { return User_1.default.findById(id, function (_, doc) { return done(null, doc); }); });
+                passport_1.default.deserializeUser(function (id, done) { return User_1.default.findById(id, function (err, doc) {
+                    if (err)
+                        return done(err);
+                    return done(null, doc);
+                }); });
                 passport_1.default.use(githubStartegy_1.default());
+                passport_1.default.use(facebookStartegy_1.default());
                 if (process.env.NODE_ENV === "production") {
                     accessLogStream = fs_1.default.createWriteStream(path_1.default.join(__dirname, "access.log"), { flags: "a" });
                     app.use(morgan_1.default("combined", { stream: accessLogStream }));

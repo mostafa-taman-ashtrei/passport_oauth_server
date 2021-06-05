@@ -10,9 +10,10 @@ import passport from "passport";
 
 import ConnectToDb from "./config/database";
 import createRoutes from "./routes/createRoutes";
-import GithubStrategy from "./controllers/auth/githubStartegy";
 import { MyUser } from "./types";
 import UserModel from "./models/User";
+import GithubStrategy from "./services/auth/githubStartegy";
+import FacebookStrategy from "./services/auth/facebookStartegy";
 
 (async () => {
     config();
@@ -44,9 +45,13 @@ import UserModel from "./models/User";
     app.use(passport.session());
 
     passport.serializeUser((user: MyUser, done) => done(null, user._id));
-    passport.deserializeUser((id: string, done) => UserModel.findById(id, (_: Error, doc: MyUser) => done(null, doc)));
+    passport.deserializeUser((id: string, done) => UserModel.findById(id, (err: Error, doc: MyUser) => {
+        if (err) return done(err);
+        return done(null, doc);
+    }));
 
     passport.use(GithubStrategy());
+    passport.use(FacebookStrategy());
 
     if (process.env.NODE_ENV === "production") {
         const accessLogStream = fs.createWriteStream(path.join(__dirname, "access.log"), { flags: "a" });

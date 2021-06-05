@@ -6,6 +6,10 @@ var userSchema = new mongoose_1.Schema({
         required: false,
         type: String,
     },
+    facebookId: {
+        required: false,
+        type: String,
+    },
     username: {
         required: true,
         type: String,

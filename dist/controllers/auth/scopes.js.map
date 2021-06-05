@@ -1,0 +1,1 @@
+{"version":3,"file":"scopes.js","sourceRoot":"","sources":["../../../src/controllers/auth/scopes.ts"],"names":[],"mappings":";;;AAAa,QAAA,cAAc,GAAG;IAC1B,OAAO;IACP,kBAAkB;IAClB,iBAAiB;IACjB,mBAAmB;IACnB,gBAAgB;IAChB,eAAe;CAClB,CAAC;AAEW,QAAA,qBAAqB,GAAG;IACjC,IAAI;IACJ,OAAO;IACP,QAAQ;IACR,MAAM;IACN,QAAQ;IACR,MAAM;IACN,UAAU;IACV,cAAc;IACd,UAAU;IACV,aAAa;CAChB,CAAC"}
